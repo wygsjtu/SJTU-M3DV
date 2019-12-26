@@ -1,6 +1,6 @@
 # SJTU-M3DV
 Final project for course EE369 in SJTU, implemented in Keras+Tensorflow
-Model file 'dense.h5' is not in the file path, and can be downloaded it from[here](https://drive.google.com/open?id=1dGDvLPLX4haEq3ofeltP8ZARuycZI-PL)
+Model file 'dense.h5' is not in the file path, and can be downloaded it from [here](https://drive.google.com/open?id=1dGDvLPLX4haEq3ofeltP8ZARuycZI-PL)
 ## Requirements
 - Python 3 (Anaconda 3.5.1 specifically)
 - Tensorflow==1.14.0
