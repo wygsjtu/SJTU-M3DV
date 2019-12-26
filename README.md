@@ -1,5 +1,6 @@
 # SJTU-M3DV
 Final project for course EE369 in SJTU, implemented in Keras+Tensorflow
+Model file 'dense.h5' is not in the file path, and can be downloaded it from[here](https://drive.google.com/open?id=1dGDvLPLX4haEq3ofeltP8ZARuycZI-PL)
 ## Requirements
 - Python 3 (Anaconda 3.5.1 specifically)
 - Tensorflow==1.14.0
@@ -16,4 +17,3 @@ Final project for course EE369 in SJTU, implemented in Keras+Tensorflow
 [data_train_inc.py](https://github.com/wygsjtu/SJTU-M3DV/data_train_inc.py)<br />
 [misc.py](https://github.com/wygsjtu/SJTU-M3DV/misc.py): basic functions<br />
 [test.py](https://github.com/wygsjtu/SJTU-M3DV/test.py): load model<br />
-[dense.h5](https://github.com/wygsjtu/SJTU-M3DV/dense.h5): saved model<br />
