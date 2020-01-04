@@ -32,4 +32,4 @@ load_predict = calc_rate(load_predict)
 load_predicted = np.array(load_predict).reshape(test_num)
 load_test_dict = {'Id':test_name, 'Predicted':load_predicted}
 load_result = pd.DataFrame(load_test_dict, index = [0 for _ in range(test_num)])
-load_result.to_csv("load_result.csv", index = False, sep = ',')
+load_result.to_csv("submission.csv", index = False, sep = ',')
