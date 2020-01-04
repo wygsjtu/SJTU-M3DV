@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import keras
 from keras.optimizers import Adam
-from keras.callbacks import EarlyStopping
 from densenet import densenet
 from misc import set_gpu_usage, mixup, updown, frontback, leftrignt
 
@@ -11,7 +11,7 @@ set_gpu_usage()
 # initialize
 BATCH_SIZE = 32
 NUM_CLASSES = 2
-NUM_EPOCHS = 100
+NUM_EPOCHS = 150
 MASK_SIZE = 32
 train_val_num = 465
 test_num = 117
@@ -92,15 +92,54 @@ train_label = keras.utils.to_categorical(train_label, NUM_CLASSES)
 model = densenet.createDenseNet(2, input_shape, depth = 40, nb_dense_block = 3, growth_rate = 12, nb_filter = 16, dropout_rate = 0.1,
         weight_decay = 1E-4, verbose = True)
 
+# record loss&accuracy
+class LossHistory(keras.callbacks.Callback):
+    def on_train_begin(self, logs={}):
+        self.losses = {'batch':[], 'epoch':[]}
+        self.accuracy = {'batch':[], 'epoch':[]}
+        self.val_loss = {'batch':[], 'epoch':[]}
+        self.val_acc = {'batch':[], 'epoch':[]}
 
+    def on_batch_end(self, batch, logs={}):
+        self.losses['batch'].append(logs.get('loss'))
+        self.accuracy['batch'].append(logs.get('acc'))
+        self.val_loss['batch'].append(logs.get('val_loss'))
+        self.val_acc['batch'].append(logs.get('val_acc'))
+
+    def on_epoch_end(self, batch, logs={}):
+        self.losses['epoch'].append(logs.get('loss'))
+        self.accuracy['epoch'].append(logs.get('acc'))
+        self.val_loss['epoch'].append(logs.get('val_loss'))
+        self.val_acc['epoch'].append(logs.get('val_acc'))
+
+    def loss_plot(self, loss_type):
+        iters = range(len(self.losses[loss_type]))
+        plt.figure()
+        # acc
+        plt.plot(iters, self.accuracy[loss_type], 'r', label='train acc')
+        # loss
+        plt.plot(iters, self.losses[loss_type], 'g', label='train loss')
+        if loss_type == 'epoch':
+            # val_acc
+            plt.plot(iters, self.val_acc[loss_type], 'b', label='val acc')
+            # val_loss
+            plt.plot(iters, self.val_loss[loss_type], 'k', label='val loss')
+        plt.grid(True)
+        plt.xlabel(loss_type)
+        plt.ylabel('acc-loss')
+        plt.legend(loc="upper right")
+        plt.savefig('./loss.jpg')
+        plt.show()
+
+history = LossHistory()
 
 # define the object function, optimizer and metrics
 model.compile(optimizer = Adam(lr = 1.e-4),
               loss = 'binary_crossentropy',
               metrics = ['binary_accuracy'])
 			  
-early_stopping = EarlyStopping(monitor = 'binary_accuracy', min_delta = 0, mode = 'max', patience = 10, verbose = 1)
-model.fit(train_data, train_label, epochs = NUM_EPOCHS, batch_size = BATCH_SIZE)
+model.fit(train_data, train_label, epochs = NUM_EPOCHS, batch_size = BATCH_SIZE, verbose = 1,
+          validation_data = (val_data, val_label), callbacks = [history])
 
 # save model and predict
 model.save("dense.h5")
@@ -115,3 +154,4 @@ predicted = np.array(predict).reshape(test_num)
 test_dict = {'Id':test_name, 'Predicted':predicted}
 result = pd.DataFrame(test_dict, index = [0 for _ in range(test_num)])
 result.to_csv("result.csv", index = False, sep = ',')
+history.loss_plot('epoch')
